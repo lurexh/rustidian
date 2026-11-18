@@ -19,7 +19,7 @@ jobs:
             targets: "x86_64-unknown-linux-musl"
           - os: ubuntu-latest
             targets: "aarch64-unknown-linux-musl"
-          - os: macos-14
+          - os: macos-latest
             targets: "aarch64-apple-darwin x86_64-apple-darwin"
           - os: windows-latest
             targets: "x86_64-pc-windows-msvc"
@@ -58,6 +58,7 @@ jobs:
 
   release:
     needs: build
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
