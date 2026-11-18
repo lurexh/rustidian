@@ -16,7 +16,9 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            targets: "x86_64-unknown-linux-musl aarch64-unknown-linux-musl"
+            targets: "x86_64-unknown-linux-musl"
+          - os: ubuntu-latest
+            targets: "aarch64-unknown-linux-musl"
           - os: macos-14
             targets: "aarch64-apple-darwin x86_64-apple-darwin"
           - os: windows-latest
