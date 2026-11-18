@@ -1,0 +1,23 @@
+[package]
+name = "rustidian"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Obsidian vault as an MCP server — single Rust binary, reads your vault directly. No Obsidian running, no plugins, minimal deps."
+repository = "https://github.com/lurexh/rustidian"
+readme = "README.md"
+keywords = ["obsidian", "mcp", "notes", "markdown", "ai"]
+categories = ["command-line-utilities", "text-processing"]
+
+[[bin]]
+name = "rustidian"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = "1"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+opt-level = "z"
