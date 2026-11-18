@@ -30,7 +30,14 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
-      - run: cargo build --release --target ${{ matrix.target }}
+      - uses: taiki-e/install-action@cross
+        if: runner.os == 'Linux'
+      - name: build
+        run: |
+          case "${{ matrix.target }}" in
+            *musl) cross build --release --target ${{ matrix.target }} ;;
+            *) cargo build --release --target ${{ matrix.target }} ;;
+          esac
       - name: package
         shell: bash
         run: |
