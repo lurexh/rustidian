@@ -9,49 +9,50 @@ permissions:
 
 jobs:
   build:
-    name: build ${{ matrix.target }}
+    name: build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-musl
+            targets: "x86_64-unknown-linux-musl aarch64-unknown-linux-musl"
           - os: macos-14
-            target: aarch64-apple-darwin
-          - os: macos-13
-            target: x86_64-apple-darwin
+            targets: "aarch64-apple-darwin x86_64-apple-darwin"
           - os: windows-latest
-            target: x86_64-pc-windows-msvc
+            targets: "x86_64-pc-windows-msvc"
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: ${{ matrix.targets }}
       - uses: taiki-e/install-action@cross
         if: runner.os == 'Linux'
       - name: build
         shell: bash
         run: |
-          case "${{ matrix.target }}" in
-            *musl) cross build --release --target ${{ matrix.target }} ;;
-            *) cargo build --release --target ${{ matrix.target }} ;;
-          esac
+          for t in ${{ matrix.targets }}; do
+            case "$t" in
+              *musl) cross build --release --target "$t" ;;
+              *) cargo build --release --target "$t" ;;
+            esac
+          done
       - name: package
         shell: bash
         run: |
-          cd "target/${{ matrix.target }}/release"
-          if [ -f rustidian.exe ]; then
-            tar czf "rustidian-${{ matrix.target }}.tar.gz" rustidian.exe
-          else
-            tar czf "rustidian-${{ matrix.target }}.tar.gz" rustidian
-          fi
+          for t in ${{ matrix.targets }}; do
+            cd "target/$t/release"
+            if [ -f rustidian.exe ]; then
+              tar czf "rustidian-$t.tar.gz" rustidian.exe
+            else
+              tar czf "rustidian-$t.tar.gz" rustidian
+            fi
+            cd "$GITHUB_WORKSPACE"
+          done
       - uses: actions/upload-artifact@v4
         with:
-          name: rustidian-${{ matrix.target }}
-          path: target/${{ matrix.target }}/release/rustidian-*.tar.gz
+          name: bins-${{ matrix.os }}
+          path: target/*/release/rustidian-*.tar.gz
 
   release:
     needs: build
