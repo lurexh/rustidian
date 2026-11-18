@@ -33,6 +33,7 @@ jobs:
       - uses: taiki-e/install-action@cross
         if: runner.os == 'Linux'
       - name: build
+        shell: bash
         run: |
           case "${{ matrix.target }}" in
             *musl) cross build --release --target ${{ matrix.target }} ;;
